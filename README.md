@@ -109,10 +109,10 @@ O sistema utiliza as seguintes tabelas principais:
 ## Interface
 
 O painel possui uma interface moderna e intuitiva com:
-- Dashboard com métricas em tempo real
-- Menu de navegação organizado
-- Formulários responsivos
-- Design Material Design
+Dashboard com métricas em tempo real
+Menu de navegação organizado
+Formulários responsivos
+Design Material Design
 
 ## Configuração
 
@@ -129,7 +129,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## Autor
 
 **Julia Rebouças Leite**
-- GitHub: [@juliareboucasleite](https://github.com/juliareboucasleite)
+GitHub: [@juliareboucasleite](https://github.com/juliareboucasleite)
 
 <img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=228B22&height=120&section=footer"/>
 
