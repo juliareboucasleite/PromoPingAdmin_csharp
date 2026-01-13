@@ -40,7 +40,7 @@ namespace Painel_Admin
 
             cmbTipo.Items.Clear();
             cmbTipo.Items.Add("Email");
-            cmbTipo.Items.Add("Telefone");
+            cmbTipo.Items.Add("Discord");
 
 
             if (string.IsNullOrEmpty(cmbTipo.Text))

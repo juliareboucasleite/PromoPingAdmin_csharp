@@ -20,8 +20,6 @@
             this.txtNome = new System.Windows.Forms.TextBox();
             this.lblEmail = new System.Windows.Forms.Label();
             this.txtEmail = new System.Windows.Forms.TextBox();
-            this.lblTelefone = new System.Windows.Forms.Label();
-            this.txtTelefone = new System.Windows.Forms.TextBox();
             this.lblPlano = new System.Windows.Forms.Label();
             this.cmbPlano = new System.Windows.Forms.ComboBox();
             this.lblCanal = new System.Windows.Forms.Label();
@@ -72,32 +70,14 @@
             this.txtEmail.Size = new System.Drawing.Size(250, 23);
             this.txtEmail.TabIndex = 3;
             // 
-            // lblTelefone
-            // 
-            this.lblTelefone.AutoSize = true;
-            this.lblTelefone.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblTelefone.Location = new System.Drawing.Point(31, 117);
-            this.lblTelefone.Name = "lblTelefone";
-            this.lblTelefone.Size = new System.Drawing.Size(59, 15);
-            this.lblTelefone.TabIndex = 4;
-            this.lblTelefone.Text = "&Telefone:";
-            // 
-            // txtTelefone
-            // 
-            this.txtTelefone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtTelefone.Location = new System.Drawing.Point(126, 115);
-            this.txtTelefone.Name = "txtTelefone";
-            this.txtTelefone.Size = new System.Drawing.Size(250, 23);
-            this.txtTelefone.TabIndex = 5;
-            // 
             // lblPlano
             // 
             this.lblPlano.AutoSize = true;
             this.lblPlano.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblPlano.Location = new System.Drawing.Point(31, 158);
+            this.lblPlano.Location = new System.Drawing.Point(31, 118);
             this.lblPlano.Name = "lblPlano";
             this.lblPlano.Size = new System.Drawing.Size(40, 15);
-            this.lblPlano.TabIndex = 6;
+            this.lblPlano.TabIndex = 4;
             this.lblPlano.Text = "&Plano:";
             // 
             // cmbPlano
@@ -105,20 +85,20 @@
             this.cmbPlano.DisplayMember = "Nome";
             this.cmbPlano.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbPlano.FormattingEnabled = true;
-            this.cmbPlano.Location = new System.Drawing.Point(126, 155);
+            this.cmbPlano.Location = new System.Drawing.Point(126, 115);
             this.cmbPlano.Name = "cmbPlano";
             this.cmbPlano.Size = new System.Drawing.Size(250, 23);
-            this.cmbPlano.TabIndex = 7;
+            this.cmbPlano.TabIndex = 5;
             this.cmbPlano.ValueMember = "Id";
             // 
             // lblCanal
             // 
             this.lblCanal.AutoSize = true;
             this.lblCanal.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblCanal.Location = new System.Drawing.Point(31, 198);
+            this.lblCanal.Location = new System.Drawing.Point(31, 158);
             this.lblCanal.Name = "lblCanal";
             this.lblCanal.Size = new System.Drawing.Size(95, 15);
-            this.lblCanal.TabIndex = 8;
+            this.lblCanal.TabIndex = 6;
             this.lblCanal.Text = "&Canal preferido:";
             // 
             // cmbCanal
@@ -127,20 +107,20 @@
             this.cmbCanal.FormattingEnabled = true;
             this.cmbCanal.Items.AddRange(new object[] {
             "Email",
-            "Telefone"});
-            this.cmbCanal.Location = new System.Drawing.Point(126, 195);
+            "Discord"});
+            this.cmbCanal.Location = new System.Drawing.Point(126, 155);
             this.cmbCanal.Name = "cmbCanal";
             this.cmbCanal.Size = new System.Drawing.Size(250, 23);
-            this.cmbCanal.TabIndex = 9;
+            this.cmbCanal.TabIndex = 7;
             // 
             // lblNotificacoes
             // 
             this.lblNotificacoes.AutoSize = true;
             this.lblNotificacoes.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblNotificacoes.Location = new System.Drawing.Point(31, 244);
+            this.lblNotificacoes.Location = new System.Drawing.Point(31, 198);
             this.lblNotificacoes.Name = "lblNotificacoes";
             this.lblNotificacoes.Size = new System.Drawing.Size(79, 15);
-            this.lblNotificacoes.TabIndex = 10;
+            this.lblNotificacoes.TabIndex = 8;
             this.lblNotificacoes.Text = "&Notificações:";
             // 
             // clbNotificacoes
@@ -150,11 +130,11 @@
             this.clbNotificacoes.FormattingEnabled = true;
             this.clbNotificacoes.Items.AddRange(new object[] {
             "Email",
-            "Telefone"});
-            this.clbNotificacoes.Location = new System.Drawing.Point(126, 235);
+            "Discord"});
+            this.clbNotificacoes.Location = new System.Drawing.Point(126, 195);
             this.clbNotificacoes.Name = "clbNotificacoes";
             this.clbNotificacoes.Size = new System.Drawing.Size(250, 38);
-            this.clbNotificacoes.TabIndex = 11;
+            this.clbNotificacoes.TabIndex = 9;
             // 
             // btnAtivo
             // 
@@ -163,7 +143,7 @@
             this.btnAtivo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAtivo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnAtivo.ForeColor = System.Drawing.Color.White;
-            this.btnAtivo.Location = new System.Drawing.Point(34, 324);
+            this.btnAtivo.Location = new System.Drawing.Point(34, 284);
             this.btnAtivo.Name = "btnAtivo";
             this.btnAtivo.Size = new System.Drawing.Size(70, 30);
             this.btnAtivo.TabIndex = 14;
@@ -177,7 +157,7 @@
             this.btnSalvar.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnSalvar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnSalvar.ForeColor = System.Drawing.Color.White;
-            this.btnSalvar.Location = new System.Drawing.Point(126, 324);
+            this.btnSalvar.Location = new System.Drawing.Point(126, 284);
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new System.Drawing.Size(100, 30);
             this.btnSalvar.TabIndex = 15;
@@ -191,7 +171,7 @@
             this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCancelar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnCancelar.ForeColor = System.Drawing.Color.White;
-            this.btnCancelar.Location = new System.Drawing.Point(276, 324);
+            this.btnCancelar.Location = new System.Drawing.Point(276, 284);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(100, 30);
             this.btnCancelar.TabIndex = 16;
@@ -203,10 +183,10 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(29, 285);
+            this.label1.Location = new System.Drawing.Point(29, 245);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(91, 15);
-            this.label1.TabIndex = 12;
+            this.label1.TabIndex = 10;
             this.label1.Text = "&Tipo Utilizador:";
             // 
             // ComboTipoUtilizador
@@ -217,10 +197,10 @@
             this.ComboTipoUtilizador.Items.AddRange(new object[] {
             "Admin",
             "Utilizador"});
-            this.ComboTipoUtilizador.Location = new System.Drawing.Point(126, 282);
+            this.ComboTipoUtilizador.Location = new System.Drawing.Point(126, 242);
             this.ComboTipoUtilizador.Name = "ComboTipoUtilizador";
             this.ComboTipoUtilizador.Size = new System.Drawing.Size(250, 23);
-            this.ComboTipoUtilizador.TabIndex = 13;
+            this.ComboTipoUtilizador.TabIndex = 11;
             // 
             // chkAtivo
             // 
@@ -235,15 +215,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(420, 388);
+            this.ClientSize = new System.Drawing.Size(420, 348);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ComboTipoUtilizador);
             this.Controls.Add(this.lblNome);
             this.Controls.Add(this.txtNome);
             this.Controls.Add(this.lblEmail);
             this.Controls.Add(this.txtEmail);
-            this.Controls.Add(this.lblTelefone);
-            this.Controls.Add(this.txtTelefone);
             this.Controls.Add(this.lblPlano);
             this.Controls.Add(this.cmbPlano);
             this.Controls.Add(this.lblCanal);
@@ -274,8 +252,6 @@
         private System.Windows.Forms.TextBox txtNome;
         private System.Windows.Forms.Label lblEmail;
         private System.Windows.Forms.TextBox txtEmail;
-        private System.Windows.Forms.Label lblTelefone;
-        private System.Windows.Forms.TextBox txtTelefone;
         private System.Windows.Forms.Label lblPlano;
         private System.Windows.Forms.ComboBox cmbPlano;
         private System.Windows.Forms.Label lblCanal;

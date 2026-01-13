@@ -265,6 +265,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="Core\App.config" />
   </ItemGroup>
   <ItemGroup>

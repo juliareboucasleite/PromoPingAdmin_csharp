@@ -8,12 +8,12 @@ namespace Painel_Admin
 {
     public partial class FormPerfilDetalhes : Form
     {
-        private readonly int _userId;
+        private readonly string _referenciaId;
 
-        public FormPerfilDetalhes(int userId)
+        public FormPerfilDetalhes(string referenciaId)
         {
             InitializeComponent();
-            _userId = userId;
+            _referenciaId = referenciaId;
         }
 
         private void FormPerfilDetalhes_Load(object sender, EventArgs e)
@@ -33,24 +33,23 @@ namespace Painel_Admin
                         SELECT 
                             u.Nome, 
                             u.Email, 
-                            u.Telefone, 
                             p.Nome AS Perfil,
                             u.Ativo,
-                            u.Data_Registo,
-                            u.ultimo_login,
-                            u.dinheiro_poupado,
+                            u.DataRegisto,
+                            u.UltimoLogin,
+                            u.DinheiroPoupado,
                             pl.Nome AS Plano,
                             c.LimiteProdutos,
                             c.CanalPreferido
                         FROM utilizadores u
                         LEFT JOIN perfis p ON p.Id = u.PerfilId
-                        LEFT JOIN configutilizador c ON c.UserId = u.Id
-                        LEFT JOIN planos pl ON pl.Id = c.PlanoId
-                        WHERE u.Id = @id;";
+                        LEFT JOIN configutilizador c ON c.ReferenciaID = u.ReferenciaID
+                        LEFT JOIN planos pl ON pl.Id = c.PlanoAtualId
+                        WHERE u.ReferenciaID = @refId;";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@id", _userId);
+                        cmd.Parameters.AddWithValue("@refId", _referenciaId);
 
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -58,25 +57,26 @@ namespace Painel_Admin
                             {
                                 IdNome.Text = reader["Nome"].ToString();
                                 IdEmail.Text = reader["Email"].ToString();
-                                IdTelemovel.Text = reader["Telefone"].ToString();
 
-                                IdPlano.Text = reader["Plano"].ToString();
+                                IdPlano.Text = reader["Plano"] != DBNull.Value ? reader["Plano"].ToString() : "Free";
                                 AplicarCorPlano(IdPlano.Text);
 
                                 bool ativo = Convert.ToInt32(reader["Ativo"]) == 1;
                                 IdAtivo.Text = ativo ? "Sim ✅" : "Não ❌";
                                 IdAtivo.ForeColor = ativo ? Color.ForestGreen : Color.Firebrick;
 
-                                IdProdutos.Text = ObterTotal("produtos", "UserId", _userId).ToString();
-                                IdNotificacoes.Text = ObterTotal("notificacoes", "UserId", _userId).ToString();
-                                IdDinheiro.Text = "€ " + Convert.ToDecimal(reader["dinheiro_poupado"]).ToString("F2");
+                                IdProdutos.Text = ObterTotal("produtos", "ReferenciaID", _referenciaId).ToString();
+                                IdNotificacoes.Text = ObterTotal("notificacoes", "ReferenciaID", _referenciaId).ToString();
+                                IdDinheiro.Text = "€ " + (reader["DinheiroPoupado"] != DBNull.Value 
+                                    ? Convert.ToDecimal(reader["DinheiroPoupado"]).ToString("F2") 
+                                    : "0.00");
 
-                                IdMembroDesde.Text = Convert
-                                    .ToDateTime(reader["Data_Registo"])
-                                    .ToString("dd/MM/yyyy HH:mm");
+                                IdMembroDesde.Text = reader["DataRegisto"] != DBNull.Value
+                                    ? Convert.ToDateTime(reader["DataRegisto"]).ToString("dd/MM/yyyy HH:mm")
+                                    : "---";
 
-                                IdUltimoLogin.Text = reader["ultimo_login"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["ultimo_login"]).ToString("dd/MM/yyyy HH:mm")
+                                IdUltimoLogin.Text = reader["UltimoLogin"] != DBNull.Value
+                                    ? Convert.ToDateTime(reader["UltimoLogin"]).ToString("dd/MM/yyyy HH:mm")
                                     : "---";
 
                                 IdLimitesProdutos.Text = reader["LimiteProdutos"] != DBNull.Value
@@ -85,7 +85,7 @@ namespace Painel_Admin
 
                                 IdCanalPreferido.Text = reader["CanalPreferido"] != DBNull.Value
                                     ? reader["CanalPreferido"].ToString()
-                                    : "Email";
+                                    : "email";
 
                                 AplicarCorCanal(IdCanalPreferido.Text);
                             }
@@ -128,7 +128,7 @@ namespace Painel_Admin
                 case "email":
                     IdCanalPreferido.ForeColor = Color.MediumBlue;
                     break;
-                case "telefone":
+                case "discord":
                     IdCanalPreferido.ForeColor = Color.Purple;
                     break;
                 default:
@@ -137,17 +137,17 @@ namespace Painel_Admin
             }
         }
 
-        private int ObterTotal(string tabela, string campoUser, int userId)
+        private int ObterTotal(string tabela, string campoUser, string referenciaId)
         {
             try
             {
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
-                    string query = $"SELECT COUNT(*) FROM {tabela} WHERE {campoUser} = @id;";
+                    string query = $"SELECT COUNT(*) FROM {tabela} WHERE {campoUser} = @refId;";
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@id", userId);
+                        cmd.Parameters.AddWithValue("@refId", referenciaId);
                         return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
@@ -168,11 +168,11 @@ namespace Painel_Admin
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
-                    string query = "SELECT Tipo, Ativo FROM preferenciasnotificacao WHERE UserId=@id";
+                    string query = "SELECT Tipo, Ativo FROM preferenciasnotificacao WHERE ReferenciaID=@refId";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@id", _userId);
+                        cmd.Parameters.AddWithValue("@refId", _referenciaId);
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -209,11 +209,11 @@ namespace Painel_Admin
                     {
                         int ativo = clbNotificacoes.CheckedItems.Contains(item) ? 1 : 0;
                         var cmd = new MySqlCommand(@"
-                            INSERT INTO preferenciasnotificacao (UserId, Tipo, Ativo)
-                            VALUES (@userId, @tipo, @ativo)
+                            INSERT INTO preferenciasnotificacao (ReferenciaID, Tipo, Ativo)
+                            VALUES (@refId, @tipo, @ativo)
                             ON DUPLICATE KEY UPDATE Ativo=@ativo;", con);
 
-                        cmd.Parameters.AddWithValue("@userId", _userId);
+                        cmd.Parameters.AddWithValue("@refId", _referenciaId);
                         cmd.Parameters.AddWithValue("@tipo", item.ToLower());
                         cmd.Parameters.AddWithValue("@ativo", ativo);
                         cmd.ExecuteNonQuery();
@@ -232,10 +232,9 @@ namespace Painel_Admin
         private void btnEditarPerfil_Click(object sender, EventArgs e)
         {
             var editar = new FormPerfilEditar(
-                _userId,
+                _referenciaId,
                 IdNome.Text,
                 IdEmail.Text,
-                IdTelemovel.Text,
                 IdPlano.Text,
                 IdCanalPreferido.Text,
                 IdAtivo.Text.Contains("Sim")

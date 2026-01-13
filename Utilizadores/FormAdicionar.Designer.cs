@@ -118,7 +118,7 @@
             // 
             this.CmbCanal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CmbCanal.FormattingEnabled = true;
-            this.CmbCanal.Items.AddRange(new object[] { "email", "telefone" });
+            this.CmbCanal.Items.AddRange(new object[] { "email", "discord" });
             this.CmbCanal.Location = new System.Drawing.Point(126, 193);
             this.CmbCanal.Name = "CmbCanal";
             this.CmbCanal.Size = new System.Drawing.Size(250, 23);
@@ -136,7 +136,7 @@
             // ClbNotificacoes
             // 
             this.ClbNotificacoes.CheckOnClick = true;
-            this.ClbNotificacoes.Items.AddRange(new object[] { "Email", "Telefone" });
+            this.ClbNotificacoes.Items.AddRange(new object[] { "Email", "Discord" });
             this.ClbNotificacoes.Location = new System.Drawing.Point(126, 230);
             this.ClbNotificacoes.Name = "ClbNotificacoes";
             this.ClbNotificacoes.Size = new System.Drawing.Size(250, 38);

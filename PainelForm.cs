@@ -50,12 +50,26 @@ namespace Painel_Admin
 
         private void perfilDetalhesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new FormPerfilDetalhes(1).ShowDialog();
+            if (!string.IsNullOrEmpty(Auth.Sessao.UserId))
+            {
+                new FormPerfilDetalhes(Auth.Sessao.UserId).ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Utilizador não autenticado!", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void perfilEditarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new FormPerfilEditar(1, "Nome", "email@teste.com", "910000000", "free", "email", true).ShowDialog();
+            if (!string.IsNullOrEmpty(Auth.Sessao.UserId))
+            {
+                new FormPerfilEditar(Auth.Sessao.UserId, Auth.Sessao.Nome, Auth.Sessao.Email, "1", "email", true).ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Utilizador não autenticado!", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void editarNotificacoesToolStripMenuItem_Click(object sender, EventArgs e)

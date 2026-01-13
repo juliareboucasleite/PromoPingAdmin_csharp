@@ -46,10 +46,9 @@ namespace Painel_Admin
                     con.Open();
                     string query = @"
                         SELECT 
-                            u.Id AS UserId,
+                            u.ReferenciaID,
                             u.Nome,
                             u.Email,
-                            u.Telefone,
                             p.Nome AS Perfil,
                             u.Ativo
                         FROM utilizadores u
@@ -61,10 +60,9 @@ namespace Painel_Admin
                     var dt = new DataTable();
                     adapter.Fill(dt);
                     dgvUtilizadores.DataSource = dt;
-                    dgvUtilizadores.Columns["UserId"].HeaderText = "ID";
+                    dgvUtilizadores.Columns["ReferenciaID"].HeaderText = "Referência";
                     dgvUtilizadores.Columns["Nome"].HeaderText = "Nome";
                     dgvUtilizadores.Columns["Email"].HeaderText = "Email";
-                    dgvUtilizadores.Columns["Telefone"].HeaderText = "Telefone";
                     dgvUtilizadores.Columns["Perfil"].HeaderText = "Perfil";
                     dgvUtilizadores.Columns["Ativo"].HeaderText = "Ativo";
                     dgvUtilizadores.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -94,23 +92,22 @@ namespace Painel_Admin
 
             try
             {
-                int id = Convert.ToInt32(dgvUtilizadores.CurrentRow.Cells["UserId"].Value);
+                string referenciaId = dgvUtilizadores.CurrentRow.Cells["ReferenciaID"].Value.ToString();
                 string nome = dgvUtilizadores.CurrentRow.Cells["Nome"].Value.ToString();
                 string email = dgvUtilizadores.CurrentRow.Cells["Email"].Value.ToString();
-                string telefone = dgvUtilizadores.CurrentRow.Cells["Telefone"].Value?.ToString() ?? "";
                 bool ativo = Convert.ToBoolean(dgvUtilizadores.CurrentRow.Cells["Ativo"].Value);
                 string canal = "email";
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
-                    var cmd = new MySqlCommand("SELECT CanalPreferido FROM configutilizador WHERE UserId=@id", con);
-                    cmd.Parameters.AddWithValue("@id", id);
+                    var cmd = new MySqlCommand("SELECT CanalPreferido FROM configutilizador WHERE ReferenciaID=@refId", con);
+                    cmd.Parameters.AddWithValue("@refId", referenciaId);
                     var result = cmd.ExecuteScalar();
                     if (result != null)
                         canal = result.ToString();
                 }
 
-                var form = new FormPerfilEditar(id, nome, email, telefone, "free", canal, ativo);
+                var form = new FormPerfilEditar(referenciaId, nome, email, "1", canal, ativo);
                 if (form.ShowDialog() == DialogResult.OK)
                     CarregarUtilizadores();
             }
@@ -161,8 +158,8 @@ namespace Painel_Admin
             }
             try
             {
-                int id = Convert.ToInt32(dgvUtilizadores.CurrentRow.Cells["UserId"].Value);
-                var form = new FormPerfilDetalhes(id);
+                string referenciaId = dgvUtilizadores.CurrentRow.Cells["ReferenciaID"].Value.ToString();
+                var form = new FormPerfilDetalhes(referenciaId);
                 form.ShowDialog();
             }
             catch (Exception ex)

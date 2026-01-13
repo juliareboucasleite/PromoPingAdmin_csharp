@@ -9,23 +9,22 @@ namespace Painel_Admin
         [STAThread]
         static void Main()
         {
-            try
+            // Testa a conexão com o banco de dados antes de iniciar a aplicação
+            if (!DbConfig.TestConnection())
             {
-                var conn = DbConfig.ConnectionString;
-                var b = new MySqlConnectionStringBuilder(conn);
-                MessageBox.Show($"A conectar no MySQL com usuário: {b.UserID}",
-                    "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                var builder = new MySqlConnectionStringBuilder(DbConfig.ConnectionString);
+                var errorMsg = $"Não foi possível conectar ao banco de dados.\n\n" +
+                              $"Servidor: {builder.Server}\n" +
+                              $"Banco de Dados: {builder.Database}\n" +
+                              $"Usuário: {builder.UserID}\n\n" +
+                              $"Verifique se:\n" +
+                              $"1. O servidor MySQL/MariaDB está em execução\n" +
+                              $"2. O banco de dados 'pap' existe\n" +
+                              $"3. As credenciais estão corretas no arquivo App.config\n" +
+                              $"4. O usuário tem permissões para acessar o banco";
 
-                using (var con = new MySqlConnection(conn))
-                {
-                    con.Open();
-                    Console.WriteLine("Conexão bem-sucedida!");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao conectar na base de dados: " + ex.Message,
-                    "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(errorMsg, "Erro de Conexão", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

@@ -1,0 +1,19 @@
+# Arquivos SQL da base de dados
+sql/pap.sql
+*.sql
+
+# Arquivos de build
+bin/
+obj/
+.vs/
+
+# Arquivos de configuração do Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log

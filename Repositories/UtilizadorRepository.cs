@@ -12,7 +12,7 @@ namespace Painel_Admin
             {
                 con.Open();
 
-                string query = @"SELECT Id, Nome, Email, Telefone, PerfilId, Ativo, Data_Registo 
+                string query = @"SELECT ReferenciaID, Nome, Email, PerfilId, Ativo, DataRegisto 
                                  FROM utilizadores";
 
                 using (var cmd = new MySqlCommand(query, con))
@@ -24,22 +24,21 @@ namespace Painel_Admin
                 }
             }
         }
-        public void Add(string nome, string email, string senhaHash, string telefone, bool ativo, int perfilId)
+        public void Add(string nome, string email, string senhaHash, bool ativo, int perfilId)
         {
             using (var con = new MySqlConnection(DbConfig.ConnectionString))
             {
                 con.Open();
 
                 string query = @"INSERT INTO utilizadores 
-                        (Nome, Email, SenhaHash, Telefone, Ativo, PerfilId, Data_Registo, EmailVerificado, CodigoEmail)
-                        VALUES (@nome, @mail, @senhaHash, @tel, @ativo, @perfil, NOW(), 1, 0)";
+                        (Nome, Email, SenhaHash, Ativo, PerfilId, DataRegisto, EmailVerificado)
+                        VALUES (@nome, @mail, @senhaHash, @ativo, @perfil, NOW(), 1)";
 
                 using (var cmd = new MySqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@nome", nome);
                     cmd.Parameters.AddWithValue("@mail", email);
                     cmd.Parameters.AddWithValue("@senhaHash", senhaHash);
-                    cmd.Parameters.AddWithValue("@tel", string.IsNullOrEmpty(telefone) ? (object)DBNull.Value : telefone);
                     cmd.Parameters.AddWithValue("@ativo", ativo ? 1 : 0);
                     cmd.Parameters.AddWithValue("@perfil", perfilId);
 
@@ -48,22 +47,21 @@ namespace Painel_Admin
             }
         }
 
-        public void Update(int id, string nome, string email, string telefone, bool ativo, int perfilId)
+        public void Update(string referenciaId, string nome, string email, bool ativo, int perfilId)
         {
             using (var con = new MySqlConnection(DbConfig.ConnectionString))
             {
                 con.Open();
 
                 string query = @"UPDATE utilizadores 
-                         SET Nome=@nome, Email=@mail, Telefone=@tel, Ativo=@ativo, PerfilId=@perfil
-                         WHERE Id=@id";
+                         SET Nome=@nome, Email=@mail, Ativo=@ativo, PerfilId=@perfil
+                         WHERE ReferenciaID=@refId";
 
                 using (var cmd = new MySqlCommand(query, con))
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@refId", referenciaId);
                     cmd.Parameters.AddWithValue("@nome", nome);
                     cmd.Parameters.AddWithValue("@mail", email);
-                    cmd.Parameters.AddWithValue("@tel", string.IsNullOrEmpty(telefone) ? (object)DBNull.Value : telefone);
                     cmd.Parameters.AddWithValue("@ativo", ativo ? 1 : 0);
                     cmd.Parameters.AddWithValue("@perfil", perfilId);
 
@@ -71,16 +69,16 @@ namespace Painel_Admin
                 }
             }
         }
-        public void Delete(int id)
+        public void Delete(string referenciaId)
         {
             using (var con = new MySqlConnection(DbConfig.ConnectionString))
             {
                 con.Open();
 
-                string query = "DELETE FROM utilizadores WHERE Id=@id";
+                string query = "DELETE FROM utilizadores WHERE ReferenciaID=@refId";
                 using (var cmd = new MySqlCommand(query, con))
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@refId", referenciaId);
                     cmd.ExecuteNonQuery();
                 }
             }

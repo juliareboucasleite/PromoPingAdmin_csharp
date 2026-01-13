@@ -8,21 +8,20 @@ namespace Painel_Admin
 {
     public partial class FormPerfilEditar : Form
     {
-        private int _userId;
+        private string _userId; // ReferenciaID
 
-        public FormPerfilEditar(int userId, string nome, string email, string telefone, string planoId, string canal, bool ativo)
+        public FormPerfilEditar(string referenciaId, string nome, string email, string planoId, string canal, bool ativo)
         {
             InitializeComponent();
-            _userId = userId;
+            _userId = referenciaId;
 
             txtNome.Text = nome;
             txtEmail.Text = email;
-            txtTelefone.Text = telefone;
             chkAtivo.Checked = ativo;
 
             clbNotificacoes.Items.Clear();
             clbNotificacoes.Items.Add("Email", false);
-            clbNotificacoes.Items.Add("Telefone", false);
+            clbNotificacoes.Items.Add("Discord", false);
 
             AtualizarCorBotaoAtivo();
             CarregarPlanos();
@@ -107,11 +106,11 @@ namespace Painel_Admin
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
-                    string query = "SELECT Tipo, Ativo FROM preferenciasnotificacao WHERE UserId=@id";
+                    string query = "SELECT Tipo, Ativo FROM preferenciasnotificacao WHERE ReferenciaID=@refId";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@id", _userId);
+                        cmd.Parameters.AddWithValue("@refId", _userId);
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -144,14 +143,12 @@ namespace Painel_Admin
                         UPDATE utilizadores
                         SET Nome=@nome, 
                             Email=@mail, 
-                            Telefone=@tel, 
                             Ativo=@ativo
-                        WHERE Id=@id;", con);
+                        WHERE ReferenciaID=@refId;", con);
 
-                    cmd.Parameters.AddWithValue("@id", _userId);
+                    cmd.Parameters.AddWithValue("@refId", _userId);
                     cmd.Parameters.AddWithValue("@nome", txtNome.Text);
                     cmd.Parameters.AddWithValue("@mail", txtEmail.Text);
-                    cmd.Parameters.AddWithValue("@tel", txtTelefone.Text);
                     cmd.Parameters.AddWithValue("@ativo", chkAtivo.Checked ? 1 : 0);
                     cmd.ExecuteNonQuery();
 
@@ -181,20 +178,22 @@ namespace Painel_Admin
                 {
                     int planoId = Convert.ToInt32(cmbPlano.SelectedValue);
 
-                    var checkCmd = new MySqlCommand("SELECT PlanoId FROM configutilizador WHERE UserId = @userId", con);
-                    checkCmd.Parameters.AddWithValue("@userId", _userId);
+                    // Verifica se já existe registro na configutilizador
+                    var checkCmd = new MySqlCommand("SELECT PlanoAtualId FROM configutilizador WHERE ReferenciaID = @refId", con);
+                    checkCmd.Parameters.AddWithValue("@refId", _userId);
                     var planoAtualObj = checkCmd.ExecuteScalar();
                     int planoAtual = planoAtualObj != DBNull.Value && planoAtualObj != null ? Convert.ToInt32(planoAtualObj) : -1;
 
                     if (planoAtual == -1)
                     {
+                        // Novo registro
                         var insertCmd = new MySqlCommand(@"
-                            INSERT INTO configutilizador 
-                                (UserId, PlanoId, LimiteProdutos, HistoricoDias, CanalPreferido, NotificacoesEnviadas, HistoricoAtivo)
-                            SELECT @userId, Id, LimiteProdutos, HistoricoDias, 'email', 0, 1 
-                            FROM planos WHERE Id = @planoId", con);
+                    INSERT INTO configutilizador 
+                        (ReferenciaID, PlanoAtualId, PlanoAtivoId, LimiteProdutos, HistoricoDias, CanalPreferido, NotificacoesEnviadas, HistoricoAtivo, StatusAssinatura, DataInicio)
+                    SELECT @refId, Id, Id, LimiteProdutos, HistoricoDias, 'email', 0, 1, 'Ativa', NOW()
+                    FROM planos WHERE Id = @planoId;", con);
 
-                        insertCmd.Parameters.AddWithValue("@userId", _userId);
+                        insertCmd.Parameters.AddWithValue("@refId", _userId);
                         insertCmd.Parameters.AddWithValue("@planoId", planoId);
                         insertCmd.ExecuteNonQuery();
 
@@ -202,21 +201,24 @@ namespace Painel_Admin
                     }
                     else
                     {
+                        // Atualiza plano existente
                         var updateCmd = new MySqlCommand(@"
-                            UPDATE configutilizador 
-                            SET PlanoId = @planoId,
-                                LimiteProdutos = (SELECT LimiteProdutos FROM planos WHERE Id = @planoId),
-                                HistoricoDias = (SELECT HistoricoDias FROM planos WHERE Id = @planoId)
-                            WHERE UserId = @userId", con);
+                    UPDATE configutilizador 
+                    SET PlanoAtualId = @planoId,
+                        PlanoAtivoId = @planoId,
+                        LimiteProdutos = (SELECT LimiteProdutos FROM planos WHERE Id = @planoId),
+                        HistoricoDias = (SELECT HistoricoDias FROM planos WHERE Id = @planoId),
+                        StatusAssinatura = 'Ativa'
+                    WHERE ReferenciaID = @refId;", con);
 
-                        updateCmd.Parameters.AddWithValue("@userId", _userId);
+                        updateCmd.Parameters.AddWithValue("@refId", _userId);
                         updateCmd.Parameters.AddWithValue("@planoId", planoId);
                         updateCmd.ExecuteNonQuery();
 
                         if (planoId != planoAtual)
                         {
                             var planoNome = ((PlanoItem)cmbPlano.SelectedItem).Nome;
-                            MessageBox.Show($"Plano atualizado para \"{planoNome}\" com sucesso","Plano Atualizado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show($"Plano atualizado para \"{planoNome}\" com sucesso", "Plano Atualizado", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
@@ -226,6 +228,7 @@ namespace Painel_Admin
                 MessageBox.Show($"Erro ao atualizar plano: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
         /// <summary>
         /// Atualiza o canal preferido do utilizador na tabela configutilizador.
         /// </summary>
@@ -233,8 +236,8 @@ namespace Painel_Admin
         private void AtualizarCanalPreferido(MySqlConnection con)
         {
             string canal = cmbCanal.SelectedItem?.ToString() ?? "email";
-            var cmd = new MySqlCommand("UPDATE configutilizador SET CanalPreferido=@canal WHERE UserId=@userId", con);
-            cmd.Parameters.AddWithValue("@userId", _userId);
+            var cmd = new MySqlCommand("UPDATE configutilizador SET CanalPreferido=@canal WHERE ReferenciaID=@refId", con);
+            cmd.Parameters.AddWithValue("@refId", _userId);
             cmd.Parameters.AddWithValue("@canal", canal.ToLower());
             cmd.ExecuteNonQuery();
         }
@@ -248,11 +251,11 @@ namespace Painel_Admin
             {
                 int ativo = clbNotificacoes.CheckedItems.Contains(item) ? 1 : 0;
                 var cmd2 = new MySqlCommand(@"
-                    INSERT INTO preferenciasnotificacao (UserId, Tipo, Ativo)
-                    VALUES (@userId, @tipo, @ativo)
+                    INSERT INTO preferenciasnotificacao (ReferenciaID, Tipo, Ativo)
+                    VALUES (@refId, @tipo, @ativo)
                     ON DUPLICATE KEY UPDATE Ativo=@ativo;", con);
 
-                cmd2.Parameters.AddWithValue("@userId", _userId);
+                cmd2.Parameters.AddWithValue("@refId", _userId);
                 cmd2.Parameters.AddWithValue("@tipo", item.ToLower());
                 cmd2.Parameters.AddWithValue("@ativo", ativo);
                 cmd2.ExecuteNonQuery();
@@ -267,13 +270,13 @@ namespace Painel_Admin
             {
                 btnAtivo.BackColor = System.Drawing.Color.SeaGreen;
                 btnAtivo.ForeColor = System.Drawing.Color.White;
-                btnAtivo.Text = "Ativo ✅";
+                btnAtivo.Text = "Ativo";
             }
             else
             {
                 btnAtivo.BackColor = System.Drawing.Color.DarkGray;
                 btnAtivo.ForeColor = System.Drawing.Color.White;
-                btnAtivo.Text = "Inativo ❌";
+                btnAtivo.Text = "Inativo";
             }
         }
 

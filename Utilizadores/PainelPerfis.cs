@@ -27,10 +27,9 @@ namespace Painel_Admin
                     con.Open();
                     var query = @"
                         SELECT 
-                            u.Id, 
+                            u.ReferenciaID, 
                             u.Nome, 
                             u.Email, 
-                            u.Telefone, 
                             u.Ativo, 
                             p.Nome AS Perfil
                         FROM utilizadores u
@@ -45,10 +44,9 @@ namespace Painel_Admin
                     }
                     if (dgvPerfis.Columns.Count > 0)
                     {
-                        dgvPerfis.Columns["Id"].HeaderText = "ID";
+                        dgvPerfis.Columns["ReferenciaID"].HeaderText = "Referência";
                         dgvPerfis.Columns["Nome"].HeaderText = "Nome";
                         dgvPerfis.Columns["Email"].HeaderText = "Email";
-                        dgvPerfis.Columns["Telefone"].HeaderText = "Telefone";
                         dgvPerfis.Columns["Perfil"].HeaderText = "Perfil";
                         dgvPerfis.Columns["Ativo"].HeaderText = "Ativo";
 
@@ -73,15 +71,24 @@ namespace Painel_Admin
         {
             if (dgvPerfis.CurrentRow != null)
             {
-                int id = Convert.ToInt32(dgvPerfis.CurrentRow.Cells["Id"].Value);
+                string referenciaId = dgvPerfis.CurrentRow.Cells["ReferenciaID"].Value.ToString();
                 string nome = dgvPerfis.CurrentRow.Cells["Nome"].Value.ToString();
                 string email = dgvPerfis.CurrentRow.Cells["Email"].Value.ToString();
-                string telefone = dgvPerfis.CurrentRow.Cells["Telefone"].Value.ToString();
                 string perfil = dgvPerfis.CurrentRow.Cells["Perfil"].Value.ToString();
                 bool ativo = Convert.ToInt32(dgvPerfis.CurrentRow.Cells["Ativo"].Value) == 1;
 
                 string canal = "email";
-                var frm = new FormPerfilEditar(id, nome, email, telefone, "free", canal, ativo);
+                using (var con = new MySqlConnection(DbConfig.ConnectionString))
+                {
+                    con.Open();
+                    var cmd = new MySqlCommand("SELECT CanalPreferido FROM configutilizador WHERE ReferenciaID=@refId", con);
+                    cmd.Parameters.AddWithValue("@refId", referenciaId);
+                    var result = cmd.ExecuteScalar();
+                    if (result != null)
+                        canal = result.ToString();
+                }
+
+                var frm = new FormPerfilEditar(referenciaId, nome, email, "1", canal, ativo);
 
                 if (frm.ShowDialog() == DialogResult.OK)
                     CarregarPerfis();
@@ -91,7 +98,7 @@ namespace Painel_Admin
         {
             if (dgvPerfis.CurrentRow != null)
             {
-                int id = Convert.ToInt32(dgvPerfis.CurrentRow.Cells["Id"].Value);
+                string referenciaId = dgvPerfis.CurrentRow.Cells["ReferenciaID"].Value.ToString();
                 if (MessageBox.Show("Remover este utilizador administrador?", "Confirmação",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
@@ -100,8 +107,8 @@ namespace Painel_Admin
                         using (var con = new MySqlConnection(DbConfig.ConnectionString))
                         {
                             con.Open();
-                            var cmd = new MySqlCommand("DELETE FROM utilizadores WHERE Id=@id", con);
-                            cmd.Parameters.AddWithValue("@id", id);
+                            var cmd = new MySqlCommand("DELETE FROM utilizadores WHERE ReferenciaID=@refId", con);
+                            cmd.Parameters.AddWithValue("@refId", referenciaId);
                             cmd.ExecuteNonQuery();
                         }
                         CarregarPerfis();

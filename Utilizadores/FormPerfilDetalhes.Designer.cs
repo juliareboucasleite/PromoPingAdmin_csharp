@@ -18,12 +18,10 @@
             this.grpInfo = new System.Windows.Forms.GroupBox();
             this.IdAtivo = new System.Windows.Forms.Label();
             this.IdPlano = new System.Windows.Forms.Label();
-            this.IdTelemovel = new System.Windows.Forms.Label();
             this.IdEmail = new System.Windows.Forms.Label();
             this.IdNome = new System.Windows.Forms.Label();
             this.lblNome = new System.Windows.Forms.Label();
             this.lblEmail = new System.Windows.Forms.Label();
-            this.lblTelefone = new System.Windows.Forms.Label();
             this.lblPlano = new System.Windows.Forms.Label();
             this.lblAtivo = new System.Windows.Forms.Label();
             this.grpEstatisticas = new System.Windows.Forms.GroupBox();
@@ -55,12 +53,10 @@
             this.grpInfo.BackColor = System.Drawing.Color.White;
             this.grpInfo.Controls.Add(this.IdAtivo);
             this.grpInfo.Controls.Add(this.IdPlano);
-            this.grpInfo.Controls.Add(this.IdTelemovel);
             this.grpInfo.Controls.Add(this.IdEmail);
             this.grpInfo.Controls.Add(this.IdNome);
             this.grpInfo.Controls.Add(this.lblNome);
             this.grpInfo.Controls.Add(this.lblEmail);
-            this.grpInfo.Controls.Add(this.lblTelefone);
             this.grpInfo.Controls.Add(this.lblPlano);
             this.grpInfo.Controls.Add(this.lblAtivo);
             this.grpInfo.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
@@ -90,16 +86,6 @@
             this.IdPlano.Size = new System.Drawing.Size(43, 15);
             this.IdPlano.TabIndex = 8;
             this.IdPlano.Text = "PlanoX";
-            // 
-            // IdTelemovel
-            // 
-            this.IdTelemovel.AutoSize = true;
-            this.IdTelemovel.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.IdTelemovel.Location = new System.Drawing.Point(75, 75);
-            this.IdTelemovel.Name = "IdTelemovel";
-            this.IdTelemovel.Size = new System.Drawing.Size(58, 15);
-            this.IdTelemovel.TabIndex = 6;
-            this.IdTelemovel.Text = "931234567";
             // 
             // IdEmail
             // 
@@ -138,15 +124,6 @@
             this.lblEmail.Size = new System.Drawing.Size(43, 23);
             this.lblEmail.TabIndex = 3;
             this.lblEmail.Text = "Email:";
-            // 
-            // lblTelefone
-            // 
-            this.lblTelefone.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblTelefone.Location = new System.Drawing.Point(10, 75);
-            this.lblTelefone.Name = "lblTelefone";
-            this.lblTelefone.Size = new System.Drawing.Size(64, 23);
-            this.lblTelefone.TabIndex = 5;
-            this.lblTelefone.Text = "Telefone:";
             // 
             // lblPlano
             // 
@@ -345,7 +322,7 @@
             this.clbNotificacoes.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.clbNotificacoes.Items.AddRange(new object[] {
             "Email",
-            "Telefone"});
+            "Discord"});
             this.clbNotificacoes.Location = new System.Drawing.Point(10, 25);
             this.clbNotificacoes.Name = "clbNotificacoes";
             this.clbNotificacoes.Size = new System.Drawing.Size(200, 38);
@@ -412,12 +389,10 @@
         private System.Windows.Forms.GroupBox grpInfo;
         private System.Windows.Forms.Label lblNome;
         private System.Windows.Forms.Label lblEmail;
-        private System.Windows.Forms.Label lblTelefone;
         private System.Windows.Forms.Label lblPlano;
         private System.Windows.Forms.Label lblAtivo;
         private System.Windows.Forms.Label IdNome;
         private System.Windows.Forms.Label IdEmail;
-        private System.Windows.Forms.Label IdTelemovel;
         private System.Windows.Forms.Label IdPlano;
         private System.Windows.Forms.Label IdAtivo;
 

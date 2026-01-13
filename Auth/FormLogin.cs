@@ -26,10 +26,10 @@ namespace Painel_Admin
 
         private void BotaoEntrar_Click(object sender, EventArgs e)
         {
-            string username = TxtNome.Text.Trim();
+            string email = TxtNome.Text.Trim();
             string password = TxtSenha.Text.Trim();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 MessageBox.Show("Por favor, preencha todos os campos!", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -42,11 +42,11 @@ namespace Painel_Admin
                 using (MySqlConnection con = new MySqlConnection(connStr))
                 {
                     con.Open();
-                    string query = "SELECT Id, Nome, Email, SenhaHash FROM utilizadores WHERE Nome = @nome";
+                    string query = "SELECT ReferenciaID, Nome, Email, SenhaHash FROM utilizadores WHERE Email = @email";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@nome", username);
+                        cmd.Parameters.AddWithValue("@email", email);
 
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -61,7 +61,7 @@ namespace Painel_Admin
 
                                 if (senhaCorreta)
                                 {
-                                    Sessao.UserId = Convert.ToInt32(reader["Id"]);
+                                    Sessao.UserId = reader["ReferenciaID"].ToString();
                                     Sessao.Nome = reader["Nome"].ToString();
                                     Sessao.Email = reader["Email"].ToString();
 

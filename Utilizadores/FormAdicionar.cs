@@ -100,11 +100,11 @@ namespace Painel_Admin.Utilizadores
                 }
 
                 string senhaHash = BCrypt.Net.BCrypt.HashPassword(senha);
-                _repo.Add(nome, email, senhaHash, "", ativo, perfilId);
+                _repo.Add(nome, email, senhaHash, ativo, perfilId);
 
-                int userId = ObterUltimoIdUtilizador();
-                ConfigurarPlanoUtilizador(userId, canal);
-                ConfigurarPreferenciasNotificacao(userId);
+                string referenciaId = ObterReferenciaIdUtilizador(email);
+                ConfigurarPlanoUtilizador(referenciaId, canal);
+                ConfigurarPreferenciasNotificacao(referenciaId);
 
                 MessageBox.Show("Utilizador adicionado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 DialogResult = DialogResult.OK;
@@ -116,28 +116,30 @@ namespace Painel_Admin.Utilizadores
             }
         }
 
-        private int ObterUltimoIdUtilizador()
+        private string ObterReferenciaIdUtilizador(string email)
         {
             try
             {
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
-                    const string query = "SELECT MAX(Id) FROM utilizadores";
+                    const string query = "SELECT ReferenciaID FROM utilizadores WHERE Email = @email";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        return Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.Parameters.AddWithValue("@email", email);
+                        var result = cmd.ExecuteScalar();
+                        return result?.ToString() ?? "";
                     }
                 }
             }
             catch
             {
-                return 0;
+                return "";
             }
         }
 
-        private void ConfigurarPlanoUtilizador(int userId, string canalPreferido)
+        private void ConfigurarPlanoUtilizador(string referenciaId, string canalPreferido)
         {
             try
             {
@@ -152,14 +154,14 @@ namespace Painel_Admin.Utilizadores
 
                     const string query = @"
                 INSERT INTO configutilizador 
-                (UserId, PlanoId, LimiteProdutos, HistoricoDias, CanalPreferido, NotificacoesEnviadas, HistoricoAtivo) 
-                SELECT @userId, @planoId, LimiteProdutos, HistoricoDias, @canal, 0, 1 
+                (ReferenciaID, PlanoAtualId, PlanoAtivoId, LimiteProdutos, HistoricoDias, CanalPreferido, NotificacoesEnviadas, HistoricoAtivo) 
+                SELECT @refId, @planoId, @planoId, LimiteProdutos, HistoricoDias, @canal, 0, 1 
                 FROM planos 
                 WHERE Id = @planoId";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {
-                        cmd.Parameters.AddWithValue("@userId", userId);
+                        cmd.Parameters.AddWithValue("@refId", referenciaId);
                         cmd.Parameters.AddWithValue("@planoId", planoId);
                         cmd.Parameters.AddWithValue("@canal", canalPreferido);
                         cmd.ExecuteNonQuery();
@@ -173,7 +175,7 @@ namespace Painel_Admin.Utilizadores
         }
 
 
-        private void ConfigurarPreferenciasNotificacao(int userId)
+        private void ConfigurarPreferenciasNotificacao(string referenciaId)
         {
             try
             {
@@ -186,15 +188,15 @@ namespace Painel_Admin.Utilizadores
                         string tipo = item.ToString().ToLower();
 
                         const string query = @"
-                            INSERT INTO preferenciasnotificacao (UserId, Tipo, Ativo)
-                            SELECT @userId, @tipo, 1
+                            INSERT INTO preferenciasnotificacao (ReferenciaID, Tipo, Ativo)
+                            SELECT @refId, @tipo, 1
                             WHERE NOT EXISTS (
-                                SELECT 1 FROM preferenciasnotificacao WHERE UserId = @userId AND Tipo = @tipo
+                                SELECT 1 FROM preferenciasnotificacao WHERE ReferenciaID = @refId AND Tipo = @tipo
                             );";
 
                         using (var cmd = new MySqlCommand(query, con))
                         {
-                            cmd.Parameters.AddWithValue("@userId", userId);
+                            cmd.Parameters.AddWithValue("@refId", referenciaId);
                             cmd.Parameters.AddWithValue("@tipo", tipo);
                             cmd.ExecuteNonQuery();
                         }
@@ -203,15 +205,15 @@ namespace Painel_Admin.Utilizadores
                     if (ClbNotificacoes.CheckedItems.Count == 0)
                     {
                         const string query = @"
-                            INSERT INTO preferenciasnotificacao (UserId, Tipo, Ativo)
-                            SELECT @userId, 'email', 1
+                            INSERT INTO preferenciasnotificacao (ReferenciaID, Tipo, Ativo)
+                            SELECT @refId, 'email', 1
                             WHERE NOT EXISTS (
-                                SELECT 1 FROM preferenciasnotificacao WHERE UserId = @userId AND Tipo = 'email'
+                                SELECT 1 FROM preferenciasnotificacao WHERE ReferenciaID = @refId AND Tipo = 'email'
                             );";
 
                         using (var cmd = new MySqlCommand(query, con))
                         {
-                            cmd.Parameters.AddWithValue("@userId", userId);
+                            cmd.Parameters.AddWithValue("@refId", referenciaId);
                             cmd.ExecuteNonQuery();
                         }
                     }
