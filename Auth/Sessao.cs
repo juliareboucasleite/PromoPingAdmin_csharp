@@ -8,7 +8,7 @@ namespace Painel_Admin.Auth
 {
     public static class Sessao
     {
-        public static string UserId { get; set; } // ReferenciaID
+        public static string ReferenciaID { get; set; }
         public static string Nome { get; set; }
         public static string Email { get; set; }
     }

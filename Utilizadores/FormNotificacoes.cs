@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace Painel_Admin
 {
@@ -60,9 +61,11 @@ namespace Painel_Admin
                 try
                 {
                     int id = Convert.ToInt32(dgvNotificacoes.CurrentRow.Cells["Id"].Value);
+                    string referenciaId = dgvNotificacoes.CurrentRow.Cells["ReferenciaID"]?.Value?.ToString() ?? "";
                     string tipo = dgvNotificacoes.CurrentRow.Cells["Tipo"].Value.ToString();
                     bool ativo = Convert.ToInt32(dgvNotificacoes.CurrentRow.Cells["Ativo"].Value) == 1;
-                    var form = new FormNotificacaoEditar(id, 0, tipo, ativo);
+                    
+                    var form = new FormNotificacaoEditar(id, referenciaId, tipo, ativo);
                     if (form.ShowDialog() == DialogResult.OK)
                         CarregarPreferencias();
                 }

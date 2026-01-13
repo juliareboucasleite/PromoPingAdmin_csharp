@@ -61,7 +61,7 @@ namespace Painel_Admin
 
                                 if (senhaCorreta)
                                 {
-                                    Sessao.UserId = reader["ReferenciaID"].ToString();
+                                    Sessao.ReferenciaID = reader["ReferenciaID"].ToString();
                                     Sessao.Nome = reader["Nome"].ToString();
                                     Sessao.Email = reader["Email"].ToString();
 

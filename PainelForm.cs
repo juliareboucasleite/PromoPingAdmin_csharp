@@ -50,9 +50,9 @@ namespace Painel_Admin
 
         private void perfilDetalhesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(Auth.Sessao.UserId))
+            if (!string.IsNullOrEmpty(Auth.Sessao.ReferenciaID))
             {
-                new FormPerfilDetalhes(Auth.Sessao.UserId).ShowDialog();
+                new FormPerfilDetalhes(Auth.Sessao.ReferenciaID).ShowDialog();
             }
             else
             {
@@ -62,9 +62,9 @@ namespace Painel_Admin
 
         private void perfilEditarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(Auth.Sessao.UserId))
+            if (!string.IsNullOrEmpty(Auth.Sessao.ReferenciaID))
             {
-                new FormPerfilEditar(Auth.Sessao.UserId, Auth.Sessao.Nome, Auth.Sessao.Email, "1", "email", true).ShowDialog();
+                new FormPerfilEditar(Auth.Sessao.ReferenciaID, Auth.Sessao.Nome, Auth.Sessao.Email, "1", "email", true).ShowDialog();
             }
             else
             {

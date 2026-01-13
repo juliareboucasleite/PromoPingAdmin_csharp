@@ -20,10 +20,14 @@ namespace Painel_Admin
                         p.Nome,
                         p.Link,
                         p.PrecoAlvo,
+                        p.PrecoAtual,
                         p.DataLimite,
-                        p.Loja
+                        p.Shipping,
+                        l.Nome AS LojaNome
                     FROM produtos p
-                    INNER JOIN utilizadores u ON u.Id = p.UserId
+                    INNER JOIN utilizadores u ON u.ReferenciaID = p.ReferenciaID
+                    LEFT JOIN lojas l ON l.Id = p.LojaId
+                    WHERE p.DeletedAt IS NULL
                     ORDER BY p.Id ASC;";
 
                 using (var cmd = new MySqlCommand(query, con))
@@ -36,31 +40,31 @@ namespace Painel_Admin
             }
         }
 
-        public void Add(int userId, string nome, string link, decimal precoAlvo, DateTime? dataLimite, string loja)
+        public void Add(string referenciaId, string nome, string link, decimal precoAlvo, DateTime? dataLimite, int? lojaId)
         {
             using (var con = new MySqlConnection(DbConfig.ConnectionString))
             {
                 con.Open();
 
                 string query = @"INSERT INTO produtos 
-                                (UserId, Nome, Link, PrecoAlvo, DataLimite, Loja)
-                                 VALUES (@userId, @nome, @link, @precoAlvo, @dataLimite, @loja)";
+                                (ReferenciaID, Nome, Link, PrecoAlvo, DataLimite, LojaId)
+                                 VALUES (@refId, @nome, @link, @precoAlvo, @dataLimite, @lojaId)";
 
                 using (var cmd = new MySqlCommand(query, con))
                 {
-                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@refId", referenciaId);
                     cmd.Parameters.AddWithValue("@nome", nome);
                     cmd.Parameters.AddWithValue("@link", link);
                     cmd.Parameters.AddWithValue("@precoAlvo", precoAlvo);
                     cmd.Parameters.AddWithValue("@dataLimite", (object)dataLimite ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@loja", loja);
+                    cmd.Parameters.AddWithValue("@lojaId", (object)lojaId ?? DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public void Update(int id, string nome, string link, decimal precoAlvo, DateTime? dataLimite, string loja)
+        public void Update(int id, string nome, string link, decimal precoAlvo, DateTime? dataLimite, int? lojaId)
         {
             using (var con = new MySqlConnection(DbConfig.ConnectionString))
             {
@@ -68,7 +72,7 @@ namespace Painel_Admin
 
                 string query = @"UPDATE produtos 
                                  SET Nome=@nome, Link=@link, PrecoAlvo=@precoAlvo, 
-                                     DataLimite=@dataLimite, Loja=@loja
+                                     DataLimite=@dataLimite, LojaId=@lojaId
                                  WHERE Id=@id";
 
                 using (var cmd = new MySqlCommand(query, con))
@@ -78,7 +82,7 @@ namespace Painel_Admin
                     cmd.Parameters.AddWithValue("@link", link);
                     cmd.Parameters.AddWithValue("@precoAlvo", precoAlvo);
                     cmd.Parameters.AddWithValue("@dataLimite", (object)dataLimite ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@loja", loja);
+                    cmd.Parameters.AddWithValue("@lojaId", (object)lojaId ?? DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -92,10 +96,11 @@ namespace Painel_Admin
                 con.Open();
 
                 string query = @"
-                    SELECT DISTINCT u.Id, CONCAT(u.Id, ' - ', u.Nome) AS Nome
+                    SELECT DISTINCT u.ReferenciaID, CONCAT(u.ReferenciaID, ' - ', u.Nome) AS Nome
                     FROM produtos p
-                    INNER JOIN utilizadores u ON u.Id = p.UserId
-                    ORDER BY u.Id ASC;";
+                    INNER JOIN utilizadores u ON u.ReferenciaID = p.ReferenciaID
+                    WHERE p.DeletedAt IS NULL
+                    ORDER BY u.ReferenciaID ASC;";
 
                 using (var cmd = new MySqlCommand(query, con))
                 using (var adapter = new MySqlDataAdapter(cmd))

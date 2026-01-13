@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using Painel_Admin.Produtos;
+using MySql.Data.MySqlClient;
 
 namespace Painel_Admin
 {
@@ -32,7 +33,8 @@ namespace Painel_Admin
                     dgvProdutos.Columns["Link"].HeaderText = "Link";
                     dgvProdutos.Columns["PrecoAlvo"].HeaderText = "Preço Alvo";
                     dgvProdutos.Columns["DataLimite"].HeaderText = "Data Limite";
-                    dgvProdutos.Columns["Loja"].HeaderText = "Loja";
+                    if (dgvProdutos.Columns.Contains("LojaNome"))
+                        dgvProdutos.Columns["LojaNome"].HeaderText = "Loja";
                 }
 
                 dgvProdutos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -66,8 +68,31 @@ namespace Painel_Admin
                     string link = dgvProdutos.CurrentRow.Cells["Link"].Value.ToString();
                     decimal precoAlvo = dgvProdutos.CurrentRow.Cells["PrecoAlvo"].Value != DBNull.Value ? Convert.ToDecimal(dgvProdutos.CurrentRow.Cells["PrecoAlvo"].Value) : 0;
                     DateTime? dataLimite = dgvProdutos.CurrentRow.Cells["DataLimite"].Value != DBNull.Value ? Convert.ToDateTime(dgvProdutos.CurrentRow.Cells["DataLimite"].Value) : (DateTime?)null;
-                    string loja = dgvProdutos.CurrentRow.Cells["Loja"].Value.ToString();
-                    using (var form = new FormProdutoEditar(id, 0, nome, link, precoAlvo, dataLimite, loja))
+                    // Obter ReferenciaID do produto - buscar da base de dados
+                    string referenciaId = "";
+                    int? lojaId = null;
+                    
+                    try
+                    {
+                        using (var con = new MySql.Data.MySqlClient.MySqlConnection(DbConfig.ConnectionString))
+                        {
+                            con.Open();
+                            var cmd = new MySql.Data.MySqlClient.MySqlCommand("SELECT ReferenciaID, LojaId FROM produtos WHERE Id=@id", con);
+                            cmd.Parameters.AddWithValue("@id", id);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    referenciaId = reader["ReferenciaID"].ToString();
+                                    if (reader["LojaId"] != DBNull.Value)
+                                        lojaId = Convert.ToInt32(reader["LojaId"]);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                    
+                    using (var form = new FormProdutoEditar(id, referenciaId, nome, link, precoAlvo, dataLimite, lojaId))
                     {
                         if (form.ShowDialog() == DialogResult.OK)
                         {

@@ -56,8 +56,8 @@ namespace Painel_Admin
                     }
 
                     string query = @"INSERT INTO utilizadores 
-                                    (Nome, Email, SenhaHash, Ativo, PerfilId, Data_Registo)
-                                    VALUES (@nome, @mail, @senhaHash, 1, 1, NOW())";
+                                    (Nome, Email, SenhaHash, Ativo, PerfilId, DataRegisto, EmailVerificado)
+                                    VALUES (@nome, @mail, @senhaHash, 1, 2, NOW(), 1)";
 
                     using (var cmd = new MySqlCommand(query, con))
                     {

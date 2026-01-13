@@ -19,7 +19,7 @@ namespace Painel_Admin
             dtpDataLimite.Enabled = false;
         }
 
-        public FormProdutoEditar(int id, int userId, string nome, string link, decimal precoAlvo, DateTime? dataLimite, string loja)
+        public FormProdutoEditar(int id, string referenciaId, string nome, string link, decimal precoAlvo, DateTime? dataLimite, int? lojaId)
         {
             InitializeComponent();
             _produtoRepo = new ProdutoRepository();
@@ -41,7 +41,7 @@ namespace Painel_Admin
                 dtpDataLimite.Enabled = false;
             }
 
-            txtLoja.Text = loja;
+            txtLoja.Text = lojaId?.ToString() ?? "";
         }
 
         private void FormProdutoEditar_Load(object sender, EventArgs e)
@@ -51,7 +51,7 @@ namespace Painel_Admin
                 var users = _produtoRepo.GetUserIdsComProdutos(); 
                 ComboBoxID.DataSource = users;
                 ComboBoxID.DisplayMember = "Nome"; 
-                ComboBoxID.ValueMember = "Id";   
+                ComboBoxID.ValueMember = "ReferenciaID";   
                 ComboBoxID.SelectedIndex = -1;    
 
                 chkSemData.CheckedChanged += (s, ev) =>
@@ -77,12 +77,18 @@ namespace Painel_Admin
                     return;
                 }
 
-                int userId = Convert.ToInt32(ComboBoxID.SelectedValue);
+                string referenciaId = ComboBoxID.SelectedValue?.ToString() ?? "";
                 string nome = txtNome.Text.Trim();
                 string link = txtLink.Text.Trim();
                 decimal precoAlvo = decimal.TryParse(txtPrecoAlvo.Text, out decimal preco) ? preco : 0;
                 DateTime? dataLimite = chkSemData.Checked ? (DateTime?)null : dtpDataLimite.Value;
-                string loja = txtLoja.Text.Trim();
+                
+                // Tentar converter loja para ID
+                int? lojaId = null;
+                if (!string.IsNullOrEmpty(txtLoja.Text.Trim()) && int.TryParse(txtLoja.Text.Trim(), out int lojaIdValue))
+                {
+                    lojaId = lojaIdValue;
+                }
 
                 if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(link))
                 {
@@ -92,20 +98,25 @@ namespace Painel_Admin
 
                 if (_id == 0)
                 {
-                    _produtoRepo.Add(userId, nome, link, precoAlvo, dataLimite, loja);
+                    if (string.IsNullOrEmpty(referenciaId))
+                    {
+                        MessageBox.Show("Selecione um utilizador!", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    _produtoRepo.Add(referenciaId, nome, link, precoAlvo, dataLimite, lojaId);
                 }
                 else
                 {
-                    _produtoRepo.Update(_id, nome, link, precoAlvo, dataLimite, loja);
+                    _produtoRepo.Update(_id, nome, link, precoAlvo, dataLimite, lojaId);
                 }
 
-                MessageBox.Show("✅ Produto salvo com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Produto salvo com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("❌ Erro ao salvar produto: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Erro ao salvar produto: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -119,9 +130,9 @@ namespace Painel_Admin
         {
             if (ComboBoxID.SelectedItem is System.Data.DataRowView row)
             {
-                int id = Convert.ToInt32(row["Id"]);
-                string nome = row["Nome"].ToString();
-                Console.WriteLine($"Selecionado: ID = {id}, Nome = {nome}");
+                string referenciaId = row["ReferenciaID"]?.ToString() ?? "";
+                string nome = row["Nome"]?.ToString() ?? "";
+                Console.WriteLine($"Selecionado: ReferenciaID = {referenciaId}, Nome = {nome}");
             }
         }
         private void txtNome_TextChanged(object sender, EventArgs e){ }

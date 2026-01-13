@@ -51,12 +51,18 @@ namespace Painel_Admin.Produtos
                     return;
                 }
 
-                int userId = Convert.ToInt32(ComboBoxID.SelectedValue);
+                string referenciaId = ComboBoxID.SelectedValue?.ToString() ?? "";
                 string nome = txtNome.Text.Trim();
                 string link = txtLink.Text.Trim();
                 decimal precoAlvo = decimal.TryParse(txtPrecoAlvo.Text, out decimal preco) ? preco : 0;
                 DateTime? dataLimite = chkSemData.Checked ? (DateTime?)null : dtpDataLimite.Value;
-                string loja = txtLoja.Text.Trim();
+                
+                // Tentar converter loja para ID, se não conseguir, usar null
+                int? lojaId = null;
+                if (!string.IsNullOrEmpty(txtLoja.Text.Trim()) && int.TryParse(txtLoja.Text.Trim(), out int lojaIdValue))
+                {
+                    lojaId = lojaIdValue;
+                }
 
                 if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(link))
                 {
@@ -65,7 +71,14 @@ namespace Painel_Admin.Produtos
                     return;
                 }
 
-                _produtoRepo.Add(userId, nome, link, precoAlvo, dataLimite, loja);
+                if (string.IsNullOrEmpty(referenciaId))
+                {
+                    MessageBox.Show("Selecione um utilizador!", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                _produtoRepo.Add(referenciaId, nome, link, precoAlvo, dataLimite, lojaId);
 
                 MessageBox.Show("✅ Produto adicionado com sucesso!",
                     "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);

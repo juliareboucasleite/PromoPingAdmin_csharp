@@ -124,7 +124,7 @@ namespace Painel_Admin
                 return;
             }
 
-            int id = Convert.ToInt32(dgvUtilizadores.CurrentRow.Cells["UserId"].Value);
+            string referenciaId = dgvUtilizadores.CurrentRow.Cells["ReferenciaID"].Value.ToString();
             if (MessageBox.Show("Remover este utilizador?", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
@@ -132,8 +132,8 @@ namespace Painel_Admin
                     using (var con = new MySqlConnection(DbConfig.ConnectionString))
                     {
                         con.Open();
-                        var cmd = new MySqlCommand("DELETE FROM utilizadores WHERE Id=@id", con);
-                        cmd.Parameters.AddWithValue("@id", id);
+                        var cmd = new MySqlCommand("DELETE FROM utilizadores WHERE ReferenciaID=@refId", con);
+                        cmd.Parameters.AddWithValue("@refId", referenciaId);
                         cmd.ExecuteNonQuery();
                     }
                     CarregarUtilizadores();

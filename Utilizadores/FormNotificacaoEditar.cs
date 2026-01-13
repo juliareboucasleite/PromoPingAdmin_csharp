@@ -18,7 +18,7 @@ namespace Painel_Admin
             _id = 0;
         }
 
-        public FormNotificacaoEditar(int id, int userId, string tipo, bool ativo)
+        public FormNotificacaoEditar(int id, string referenciaId, string tipo, bool ativo)
         {
             InitializeComponent();
             _repo = new PreferenciaNotificacaoRepository();
@@ -27,8 +27,8 @@ namespace Painel_Admin
 
             CarregarUtilizadores();
 
-            if (userId > 0)
-                cmbUser.SelectedValue = userId;
+            if (!string.IsNullOrEmpty(referenciaId))
+                cmbUser.SelectedValue = referenciaId;
 
             cmbTipo.SelectedItem = tipo;
             chkAtivo.Checked = ativo;
@@ -55,7 +55,7 @@ namespace Painel_Admin
 
                 cmbUser.DataSource = dtUsers;
                 cmbUser.DisplayMember = "Nome";
-                cmbUser.ValueMember = "Id";
+                cmbUser.ValueMember = "ReferenciaID";
                 cmbUser.SelectedIndex = -1;
             }
             catch (Exception ex)
@@ -74,14 +74,20 @@ namespace Painel_Admin
                     return;
                 }
 
-                int userId = Convert.ToInt32(cmbUser.SelectedValue);
+                string referenciaId = cmbUser.SelectedValue?.ToString() ?? "";
                 string tipo = cmbTipo.SelectedItem?.ToString() ?? "email";
                 bool ativo = chkAtivo.Checked;
 
+                if (string.IsNullOrEmpty(referenciaId))
+                {
+                    MessageBox.Show("Selecione um utilizador!");
+                    return;
+                }
+
                 if (_id == 0)
-                    _repo.Add(userId, tipo, ativo);
+                    _repo.Add(referenciaId, tipo, ativo);
                 else
-                    _repo.Update(_id, userId, tipo, ativo);
+                    _repo.Update(_id, referenciaId, tipo, ativo);
 
                 MessageBox.Show("Preferência salva com sucesso!",
                                 "Notificações", MessageBoxButtons.OK, MessageBoxIcon.Information);
