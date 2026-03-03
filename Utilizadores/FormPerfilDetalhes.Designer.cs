@@ -73,7 +73,7 @@
             this.IdAtivo.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdAtivo.Location = new System.Drawing.Point(240, 100);
             this.IdAtivo.Name = "IdAtivo";
-            this.IdAtivo.Size = new System.Drawing.Size(32, 15);
+            this.IdAtivo.Size = new System.Drawing.Size(27, 15);
             this.IdAtivo.TabIndex = 9;
             this.IdAtivo.Text = "Sim";
             // 
@@ -83,7 +83,7 @@
             this.IdPlano.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdPlano.Location = new System.Drawing.Point(55, 100);
             this.IdPlano.Name = "IdPlano";
-            this.IdPlano.Size = new System.Drawing.Size(43, 15);
+            this.IdPlano.Size = new System.Drawing.Size(44, 15);
             this.IdPlano.TabIndex = 8;
             this.IdPlano.Text = "PlanoX";
             // 
@@ -93,7 +93,7 @@
             this.IdEmail.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdEmail.Location = new System.Drawing.Point(55, 50);
             this.IdEmail.Name = "IdEmail";
-            this.IdEmail.Size = new System.Drawing.Size(122, 15);
+            this.IdEmail.Size = new System.Drawing.Size(113, 15);
             this.IdEmail.TabIndex = 4;
             this.IdEmail.Text = "usuario@email.com";
             // 
@@ -103,7 +103,7 @@
             this.IdNome.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdNome.Location = new System.Drawing.Point(55, 25);
             this.IdNome.Name = "IdNome";
-            this.IdNome.Size = new System.Drawing.Size(95, 15);
+            this.IdNome.Size = new System.Drawing.Size(96, 15);
             this.IdNome.TabIndex = 2;
             this.IdNome.Text = "Nome Completo";
             // 
@@ -174,7 +174,7 @@
             this.IdCanalPreferido.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdCanalPreferido.Location = new System.Drawing.Point(115, 150);
             this.IdCanalPreferido.Name = "IdCanalPreferido";
-            this.IdCanalPreferido.Size = new System.Drawing.Size(46, 15);
+            this.IdCanalPreferido.Size = new System.Drawing.Size(36, 15);
             this.IdCanalPreferido.TabIndex = 13;
             this.IdCanalPreferido.Text = "Email";
             // 
@@ -194,7 +194,7 @@
             this.IdUltimoLogin.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdUltimoLogin.Location = new System.Drawing.Point(100, 110);
             this.IdUltimoLogin.Name = "IdUltimoLogin";
-            this.IdUltimoLogin.Size = new System.Drawing.Size(64, 15);
+            this.IdUltimoLogin.Size = new System.Drawing.Size(65, 15);
             this.IdUltimoLogin.TabIndex = 9;
             this.IdUltimoLogin.Text = "01/01/2025";
             // 
@@ -204,7 +204,7 @@
             this.IdMembroDesde.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.IdMembroDesde.Location = new System.Drawing.Point(110, 90);
             this.IdMembroDesde.Name = "IdMembroDesde";
-            this.IdMembroDesde.Size = new System.Drawing.Size(64, 15);
+            this.IdMembroDesde.Size = new System.Drawing.Size(65, 15);
             this.IdMembroDesde.TabIndex = 7;
             this.IdMembroDesde.Text = "01/01/2020";
             // 
@@ -215,9 +215,10 @@
             this.IdDinheiro.ForeColor = System.Drawing.Color.ForestGreen;
             this.IdDinheiro.Location = new System.Drawing.Point(130, 65);
             this.IdDinheiro.Name = "IdDinheiro";
-            this.IdDinheiro.Size = new System.Drawing.Size(50, 15);
+            this.IdDinheiro.Size = new System.Drawing.Size(37, 15);
             this.IdDinheiro.TabIndex = 5;
             this.IdDinheiro.Text = "€ 0.00";
+            this.IdDinheiro.Click += new System.EventHandler(this.IdDinheiro_Click);
             // 
             // IdNotificacoes
             // 
@@ -382,6 +383,7 @@
             this.grpEstatisticas.PerformLayout();
             this.grpPreferencias.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         #endregion
