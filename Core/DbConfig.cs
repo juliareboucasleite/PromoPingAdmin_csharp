@@ -24,13 +24,13 @@ namespace Painel_Admin
                         else
                         {
                             // Fallback para string padrão se não encontrar no config
-                            _connectionString = "Server=localhost;Database=pap;Uid=root;Pwd=;SslMode=none;";
+                            _connectionString = "Server=localhost;Database=papv5;Uid=root;Pwd=;SslMode=none;";
                         }
                     }
                     catch (Exception ex)
                     {
                         // Se houver erro ao ler o config, usa a string padrão
-                        _connectionString = "Server=localhost;Database=pap;Uid=root;Pwd=;SslMode=none;";
+                        _connectionString = "Server=localhost;Database=papv5;Uid=root;Pwd=;SslMode=none;";
                         System.Diagnostics.Debug.WriteLine($"Erro ao ler connection string do config: {ex.Message}");
                     }
                 }
