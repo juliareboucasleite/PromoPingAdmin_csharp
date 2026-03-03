@@ -25,6 +25,7 @@ namespace Painel_Admin
 
             AtualizarCorBotaoAtivo();
             CarregarPlanos();
+            CarregarPerfis();
 
             this.Load += (s, e) =>
             {
@@ -71,6 +72,55 @@ namespace Painel_Admin
                 MessageBox.Show($"Erro ao carregar planos: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+        /// <summary>
+        /// Carrega os perfis (roles) disponíveis e seleciona o perfil atual do utilizador.
+        /// Usa o ComboBox `ComboTipoUtilizador` (nome presente no Designer).
+        /// </summary>
+        private void CarregarPerfis()
+        {
+            try
+            {
+                using (var con = new MySqlConnection(DbConfig.ConnectionString))
+                {
+                    con.Open();
+                    var perfis = new List<PerfilItem>();
+                    using (var cmd = new MySqlCommand("SELECT Id, Nome FROM perfis ORDER BY Nome ASC", con))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            perfis.Add(new PerfilItem
+                            {
+                                Id = reader.GetInt32("Id"),
+                                Nome = reader.GetString("Nome")
+                            });
+                        }
+                    }
+
+                    ComboTipoUtilizador.DataSource = perfis;
+                    ComboTipoUtilizador.DisplayMember = "Nome";
+                    ComboTipoUtilizador.ValueMember = "Id";
+
+                    // Seleciona o Perfil atual do utilizador
+                    using (var cmdGet = new MySqlCommand("SELECT PerfilId FROM utilizadores WHERE ReferenciaID=@refId", con))
+                    {
+                        cmdGet.Parameters.AddWithValue("@refId", _userId);
+                        var perfilObj = cmdGet.ExecuteScalar();
+                        if (perfilObj != null && perfilObj != DBNull.Value)
+                        {
+                            int perfilId = Convert.ToInt32(perfilObj);
+                            ComboTipoUtilizador.SelectedValue = perfilId;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar perfis: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         /// <summary>
         /// Seleciona o plano atual do utilizador no ComboBox com base no ID fornecido.
         /// </summary>
@@ -139,17 +189,23 @@ namespace Painel_Admin
                 using (var con = new MySqlConnection(DbConfig.ConnectionString))
                 {
                     con.Open();
+                    int perfilId = 2;
+                    if (ComboTipoUtilizador.SelectedValue != null)
+                        perfilId = Convert.ToInt32(ComboTipoUtilizador.SelectedValue);
+
                     var cmd = new MySqlCommand(@"
                         UPDATE utilizadores
                         SET Nome=@nome, 
                             Email=@mail, 
-                            Ativo=@ativo
+                            Ativo=@ativo,
+                            PerfilId=@perfil
                         WHERE ReferenciaID=@refId;", con);
 
                     cmd.Parameters.AddWithValue("@refId", _userId);
                     cmd.Parameters.AddWithValue("@nome", txtNome.Text);
                     cmd.Parameters.AddWithValue("@mail", txtEmail.Text);
                     cmd.Parameters.AddWithValue("@ativo", chkAtivo.Checked ? 1 : 0);
+                    cmd.Parameters.AddWithValue("@perfil", perfilId);
                     cmd.ExecuteNonQuery();
 
                     AtualizarPlanoUtilizador(con);
@@ -282,7 +338,7 @@ namespace Painel_Admin
 
         private void chkAtivo_CheckedChanged(object sender, EventArgs e)
         {
-            chkAtivo.Checked = !chkAtivo.Checked;
+            // Corrigido: não inverter o estado novamente aqui — apenas atualiza a aparência do botão.
             AtualizarCorBotaoAtivo();
         }
 
@@ -295,6 +351,14 @@ namespace Painel_Admin
         private void FormPerfilEditar_Load(object sender, EventArgs e)
         {
 
+        }
+
+        // Pequena classe auxiliar local para popular o combo de perfis
+        private class PerfilItem
+        {
+            public int Id { get; set; }
+            public string Nome { get; set; }
+            public override string ToString() => Nome;
         }
     }
 }
