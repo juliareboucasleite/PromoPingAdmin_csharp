@@ -3,6 +3,7 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using System.Globalization;
 
 namespace Painel_Admin
 {
@@ -37,7 +38,7 @@ namespace Painel_Admin
                             u.Ativo,
                             u.DataRegisto,
                             u.UltimoLogin,
-                            u.DinheiroPoupado,
+                            u.dinheiro_poupado,
                             pl.Nome AS Plano,
                             c.LimiteProdutos,
                             c.CanalPreferido
@@ -61,31 +62,80 @@ namespace Painel_Admin
                                 IdPlano.Text = reader["Plano"] != DBNull.Value ? reader["Plano"].ToString() : "Free";
                                 AplicarCorPlano(IdPlano.Text);
 
-                                bool ativo = Convert.ToInt32(reader["Ativo"]) == 1;
+                                // Ativo pode aparecer de formas distintas; usar método auxiliar para ser tolerante
+                                var ativoObj = GetField(reader, "Ativo", "ativo");
+                                bool ativo = ativoObj != DBNull.Value && Convert.ToInt32(ativoObj) == 1;
                                 IdAtivo.Text = ativo ? "Sim ✅" : "Não ❌";
                                 IdAtivo.ForeColor = ativo ? Color.ForestGreen : Color.Firebrick;
 
                                 IdProdutos.Text = ObterTotal("produtos", "ReferenciaID", _referenciaId).ToString();
                                 IdNotificacoes.Text = ObterTotal("notificacoes", "ReferenciaID", _referenciaId).ToString();
-                                IdDinheiro.Text = "€ " + (reader["DinheiroPoupado"] != DBNull.Value 
-                                    ? Convert.ToDecimal(reader["DinheiroPoupado"]).ToString("F2") 
-                                    : "0.00");
+
+                                // Tratamento robusto para dinheiro_poupado (evita FormatException)
+                                var dinheiroObj = GetField(reader, "dinheiro_poupado", "DinheiroPoupado", "dinheiroPoupado");
+                                decimal dinheiro = 0m;
+                                if (dinheiroObj != null && dinheiroObj != DBNull.Value)
+                                {
+                                    try
+                                    {
+                                        if (dinheiroObj is decimal decVal)
+                                        {
+                                            dinheiro = decVal;
+                                        }
+                                        else if (dinheiroObj is double dblVal)
+                                        {
+                                            dinheiro = Convert.ToDecimal(dblVal);
+                                        }
+                                        else if (dinheiroObj is float fltVal)
+                                        {
+                                            dinheiro = Convert.ToDecimal(fltVal);
+                                        }
+                                        else if (dinheiroObj is long lVal)
+                                        {
+                                            dinheiro = Convert.ToDecimal(lVal);
+                                        }
+                                        else if (dinheiroObj is int iVal)
+                                        {
+                                            dinheiro = Convert.ToDecimal(iVal);
+                                        }
+                                        else
+                                        {
+                                            // Tenta parse com cultura pt-BR (virgula) e depois Invariant (ponto)
+                                            string s = dinheiroObj.ToString();
+                                            if (!decimal.TryParse(s, NumberStyles.Number, CultureInfo.GetCultureInfo("pt-BR"), out decVal) &&
+                                                !decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out decVal) &&
+                                                !decimal.TryParse(s, NumberStyles.Number, CultureInfo.CurrentCulture, out decVal))
+                                            {
+                                                decVal = 0m;
+                                            }
+                                            dinheiro = decVal;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        dinheiro = 0m;
+                                    }
+                                }
+
+                                IdDinheiro.Text = "€ " + dinheiro.ToString("F2");
 
                                 IdMembroDesde.Text = reader["DataRegisto"] != DBNull.Value
                                     ? Convert.ToDateTime(reader["DataRegisto"]).ToString("dd/MM/yyyy HH:mm")
                                     : "---";
 
-                                IdUltimoLogin.Text = reader["UltimoLogin"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["UltimoLogin"]).ToString("dd/MM/yyyy HH:mm")
+                                var ultimoLoginObj = GetField(reader, "UltimoLogin", "ultimo_login", "ultimoLogin");
+                                IdUltimoLogin.Text = ultimoLoginObj != DBNull.Value
+                                    ? Convert.ToDateTime(ultimoLoginObj).ToString("dd/MM/yyyy HH:mm")
                                     : "---";
 
                                 IdLimitesProdutos.Text = reader["LimiteProdutos"] != DBNull.Value
                                     ? reader["LimiteProdutos"].ToString()
                                     : "5";
 
+                                // CanalPreferido na base é 'discord' por defeito — refletir essa preferência aqui
                                 IdCanalPreferido.Text = reader["CanalPreferido"] != DBNull.Value
                                     ? reader["CanalPreferido"].ToString()
-                                    : "email";
+                                    : "discord";
 
                                 AplicarCorCanal(IdCanalPreferido.Text);
                             }
@@ -250,5 +300,31 @@ namespace Painel_Admin
         private void IdProdutos_Click(object sender, EventArgs e) { }
         private void IdNotificacoes_Click(object sender, EventArgs e) { }
         private void IdMembroDesde_Click(object sender, EventArgs e) { }
+
+        /// <summary>
+        /// Busca o primeiro campo existente entre os nomes fornecidos no reader.
+        /// Útil para compatibilidade com mudanças de nomes (camelCase / snake_case).
+        /// </summary>
+        private object GetField(IDataRecord reader, params string[] names)
+        {
+            foreach (var name in names)
+            {
+                try
+                {
+                    int ord = reader.GetOrdinal(name);
+                    return reader.GetValue(ord);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    // ignorar e tentar o próximo nome
+                }
+            }
+            return DBNull.Value;
+        }
+
+        private void IdDinheiro_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
