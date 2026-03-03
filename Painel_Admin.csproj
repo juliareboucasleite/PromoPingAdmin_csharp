@@ -295,8 +295,5 @@
   <ItemGroup>
     <None Include="Resources\android-chrome-192x1921.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="papv5_fixed.sql" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
