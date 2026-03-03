@@ -138,5 +138,10 @@ namespace Painel_Admin
         {
             CarregarProdutos();
         }
+
+        private void dgvProdutos_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }
